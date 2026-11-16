@@ -1,0 +1,43 @@
+name: Source checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source:
+    # The Swift/MLX build needs Apple Silicon and the Xcode 27 Metal toolchain.
+    runs-on: xcode-27
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check publication boundaries
+        run: python3 script/check_public_source.py --staged
+      - name: Test packaging and resumable notarization without Apple access
+        run: python3 -m unittest discover -s script/tests -v
+      - name: Show toolchain
+        run: |
+          uname -m
+          xcodebuild -version
+          swift --version
+      - name: Install the Metal compiler
+        run: xcodebuild -downloadComponent MetalToolchain
+      - name: Test shared app code
+        run: swift test --jobs 3
+      - name: Build Salient
+        run: swift build --jobs 3 --product SalientMini
+      - name: Build standalone Pocket runtime
+        run: ./script/build_pocket_runtime.sh
+      - name: Test native runtime without model downloads
+        run: ./script/build_pocket_runtime.sh --test

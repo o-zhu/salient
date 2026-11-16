@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Synthetic Study Fixture</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 17px/1.6 -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; color: #203b3d; background: #f2f7f6; }
+    header, main { max-width: 1080px; margin: auto; padding: 28px 32px; }
+    header { padding-bottom: 0; }
+    header p { max-width: 760px; }
+    h1 { font: 600 34px/1.2 ui-serif, Georgia, serif; }
+    main { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    section { background: white; border: 1px solid #c4d9d4; border-radius: 18px; padding: 26px; }
+    label { display: block; padding: 9px 0; cursor: pointer; }
+    button { margin: 16px 10px 0 0; border: 0; border-radius: 9px; padding: 10px 18px; font: inherit; color: white; background: #21665b; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #d07540; outline-offset: 3px; }
+    #status { min-height: 1.6em; color: #21665b; font-weight: 600; }
+    @media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+    @media (prefers-color-scheme: dark) { body { color: #e1eeeb; background: #142322; } section { background: #203330; border-color: #395650; } #status { color: #99d6c7; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Your practice space.</h1>
+    <p>This page is part of Salient. Try Read Question, choose an option, then use Submit or Next + Read. Everything here is synthetic; no real exam is changed.</p>
+  </header>
+  <main>
+    <section aria-label="Question">
+      <h2 id="item-title">Practice Item 1</h2>
+      <label><input type="checkbox"><span>Suggested </span><span>Highlights</span></label>
+      <p id="vignette">A synthetic patient has a learning objective and a short vignette.</p>
+      <p>Which review topic is most useful?</p>
+      <label><input type="radio" name="answer" value="A"> A. Review topic one</label>
+      <label><input type="radio" name="answer" value="B"> B. Review topic two</label>
+      <button id="submit" disabled>Submit</button>
+      <button id="next">Next</button>
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+    <section aria-label="Explanation">
+      <h2>Explanation</h2>
+      <p>This synthetic explanation contains no copied question-bank content.</p>
+      <p>Objective: practice deterministic reading and browser automation.</p>
+      <p>Salient reads the front tab in your chosen browser. Keep this tab selected while practicing, even if a real UWorld tab is also open.</p>
+    </section>
+  </main>
+  <script>
+    let item = 1;
+    document.querySelectorAll('input[name="answer"]').forEach(input => input.addEventListener('change', () => {
+      document.getElementById('submit').disabled = false;
+    }));
+    document.getElementById('submit').addEventListener('click', () => {
+      document.body.dataset.submitted = 'true';
+      document.getElementById('status').textContent = 'Answer submitted — practice only.';
+      document.getElementById('submit').disabled = true;
+    });
+    document.getElementById('next').addEventListener('click', () => {
+      item++;
+      document.getElementById('item-title').textContent = 'Practice Item ' + item;
+      document.getElementById('vignette').textContent = 'This is a new synthetic vignette for practicing the next-question shortcut. Item ' + item + '.';
+      document.querySelectorAll('input[name="answer"]').forEach(input => input.checked = false);
+      document.getElementById('submit').disabled = true;
+      document.getElementById('status').textContent = '';
+      delete document.body.dataset.submitted;
+    });
+  </script>
+</body>
+</html>
